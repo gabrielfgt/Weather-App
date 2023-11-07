@@ -11,7 +11,7 @@ class ViewController: UIViewController {
     
     private lazy var backgroundView: UIImageView = {
         let imageView = UIImageView(frame: .zero);
-        imageView.image = UIImage(named: "daybackground")
+        imageView.image = UIImage(named: "background-day")
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     private lazy var headerView: UIView = {
         let view = UIView(frame: .zero);
         view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = UIColor(named: "contrastCollor")
+        view.backgroundColor = UIColor(named: "transparent")
         view.layer.cornerRadius = 15
         return view
     }()
@@ -30,7 +30,7 @@ class ViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Piracicaba"
         label.textAlignment = .center
-        label.textColor = UIColor(named: "colorBlue")
+        label.textColor = UIColor(named: "contrastCollor")
         label.font = UIFont.systemFont(ofSize: 20)
         return label
     }()
@@ -41,7 +41,7 @@ class ViewController: UIViewController {
         label.text = "30 ºC"
         label.textAlignment = .left
         label.font = UIFont.systemFont(ofSize: 60, weight: .bold)
-        label.textColor = UIColor(named: "colorBlue")
+        label.textColor = UIColor(named: "contrastCollor")
         return label
     }()
     
@@ -110,7 +110,7 @@ class ViewController: UIViewController {
         stackView.axis = .vertical
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.spacing = 6
-        stackView.backgroundColor = UIColor(named: "softGray")
+        stackView.backgroundColor = UIColor(named: "transparent")
         stackView.layer.cornerRadius = 10
         stackView.isLayoutMarginsRelativeArrangement = true
         stackView.directionalLayoutMargins = NSDirectionalEdgeInsets(top: 12, leading: 24, bottom: 12, trailing: 24)
@@ -159,26 +159,50 @@ class ViewController: UIViewController {
         return tableView
     }()
     
+    private let service = Service()
+    private let city = City(lat: "-23.6814346", lon: "-46.9249599", name: "Sao Paulo")
+    private var forecastResponse: ForecastResponse?
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupView()
+       // fetchData()
     }
+   
+    /*
+    private func fetchData() {
+        service.fetchData(city: city) { [weak self] response in
+            self?.forecastResponse = response
+            DispatchQueue.main.async {
+                self?.loadData()
+            }
+            
+        }
+    }
+     */
     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
+    /*
+    private func loadData() {
+        cityLabel.text = city.name
+        
+        temperatureLabel.text = forecastResponse?.current.temp.toCelsius()
+        humidityValueLabel.text = "\(forecastResponse?.current.humidity ?? 0)mm"
+        windValueLabel.text = "\(forecastResponse?.current.windSpeed ?? 0)km/h"
+        weatherIcon.image = UIImage(named: forecastResponse?.current.weather.first?.icon ?? "")
+        
+        if forecastResponse?.current.dt.isDayTime() ?? true {
+            backgroundView.image = UIImage(named: "backgroud-day")
+        } else {
+            backgroundView.image = UIImage(named: "backgroud-night")
+        }
+        
+        
+        hourlyCollectionView.reloadData()
+        dailyForecastTableView.reloadData()
     }
+    */
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-    }
     
     private func setupView(){
         view.backgroundColor = .gray
@@ -264,10 +288,20 @@ class ViewController: UIViewController {
 extension ViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return 10
+
+        //forecastResponse?.hourly.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyForecastCollectionViewCell.identifier, for: indexPath)
+//        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: HourlyForecastCollectionViewCell.identifier, for: indexPath) as? HourlyForecastCollectionViewCell else {
+//            return UICollectionViewCell()
+//        }
+//        
+//        let forecast = forecastResponse?.hourly[indexPath.row]
+//        cell.loadData(time: forecast?.dt.toHourFormat(),
+//                      icon: UIImage(named: forecast?.weather.first?.icon ?? ""),
+//                      temp: forecast?.temp.toCelsius())
         return cell
     }
 }
@@ -275,10 +309,22 @@ extension ViewController: UICollectionViewDataSource {
 extension ViewController: UITableViewDataSource{
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 10
+        //forecastResponse?.daily.count ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: DailyForecastTableViewCell.identifier, for: indexPath)
+
+//        guard let cell = tableView.dequeueReusableCell(withIdentifier: DailyForecastTableViewCell.identifier, for: indexPath) as? DailyForecastTableViewCell else {
+//            return UITableViewCell()
+//        }
+//        
+//        let forecast = forecastResponse?.daily[indexPath.row]
+//        cell.loadData(weekDay: forecast?.dt.toWeekdayName().uppercased(),
+//                      min: forecast?.temp.min.toCelsius(),
+//                      max: forecast?.temp.max.toCelsius(),
+//                      icon: UIImage(named: forecast?.weather.first?.icon ?? ""))
+        
         return cell
     }
     
